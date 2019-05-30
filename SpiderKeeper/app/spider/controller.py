@@ -14,7 +14,7 @@ from flask_restful_swagger import swagger
 from werkzeug.utils import secure_filename
 
 from app import db, api, agent, app
-from app.spider.model import JobInstance, Project, JobExecution, SpiderInstance, JobRunType
+from app.spider.model import JobInstance, Project, JobExecution, SpiderInstance, JobRunType,MysqlAdminUser
 
 from urllib import parse
 import json
@@ -544,6 +544,9 @@ def project_manage():
 
 @app.route("/project/<project_id>/job/dashboard")
 def job_dashboard(project_id):
+    uid = checkLogin()
+    if(uid == 0):
+        return redirect("http://test.admin.house.sina.com.cn/welcome/login", code=302) 
     return render_template("job_dashboard.html", job_status=JobExecution.list_jobs(project_id))
 
 
@@ -684,7 +687,6 @@ def service_stats(project_id):
 #统一用户登录
 @app.route("/welcome",methods = ["GET","POST"])
 def welcome():
-
     key = request.args.get("key")
     admin_permit = request.args.get("admin_permit")
 
@@ -705,6 +707,13 @@ def welcome():
         response.set_cookie(current_app.config['COOKIE_PREFIX']+'uid', query['uid'])
         response.set_cookie(current_app.config['COOKIE_PREFIX']+'uid_hash', pro_key)
     return  response
+
+#用户同步
+@app.route("/syncuser",methods = ["GET","POST"])
+def syncuser():
+    user = MysqlAdminUser.query.all()
+    print(user)
+    return ''
 
 
 #验证登录并设置cookie
@@ -742,4 +751,3 @@ def checkLogin():
         return value
     else:
         return 0   
-    

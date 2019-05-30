@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import desc
-from app import db, Base
+from app import db, Base,mysql_db
 
 
 class Project(Base):
@@ -221,3 +221,12 @@ class JobExecution(Base):
             hour_key = job_execution.create_time.strftime('%Y-%m-%d %H:00:00')
             result[hour_key] += 1
         return [dict(key=hour_key, value=result[hour_key]) for hour_key in hour_keys]
+
+class MysqlAdminUser(mysql_db.Model):
+    __tablename__ = 'admin_user'
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(45), unique=True)
+    sina_id = db.Column(db.INTEGER, unique=True)
+
+    def __repr__(self):
+        return '<User %r>' % self.user_name
